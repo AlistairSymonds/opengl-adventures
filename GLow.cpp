@@ -70,9 +70,10 @@ int GLow::compileShaders()
     glLinkProgram(green_prog);
 
     colour_prog = glCreateProgram();
-    glAttachShader(colour_prog, shaders[default_vtx]);
+    glAttachShader(colour_prog, shaders[moving_vtx]);
     glAttachShader(colour_prog, shaders[colour_frag]);
     glLinkProgram(colour_prog);
+    time_uniform_loc = glGetUniformLocation(colour_prog, "time");
 
     glCheckError();
 
@@ -101,12 +102,15 @@ GLow::shaders_t GLow::file_name_to_shader_id(std::filesystem::path p)
     else if (p == "glsl/colour_interp.frag") {
         s = colour_frag;
     }
+    else if (p == "glsl/sin_translation.vert") {
+        s = moving_vtx;
+    }
     return s;
 }
 
 GLenum GLow::shader_id_to_gl_type(shaders_t s)
 {
-    if (s == default_vtx)
+    if (s == default_vtx || s == moving_vtx)
     {
         return GL_VERTEX_SHADER;
     }
@@ -120,6 +124,7 @@ GLenum GLow::shader_id_to_gl_type(shaders_t s)
 
 int GLow::render()
 {
+    float time = glfwGetTime();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     int dwords_per_vert = 6;
@@ -178,6 +183,7 @@ int GLow::render()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glUseProgram(colour_prog);
+    glUniform1f(time_uniform_loc, time);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
