@@ -149,6 +149,7 @@
     <ClInclude Include="GLow.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="glsl\default_frag.glsl" />
     <None Include="glsl\default_vtx.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

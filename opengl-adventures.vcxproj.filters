@@ -37,5 +37,8 @@
     <None Include="glsl\default_vtx.glsl">
       <Filter>glsl</Filter>
     </None>
+    <None Include="glsl\default_frag.glsl">
+      <Filter>glsl</Filter>
+    </None>
   </ItemGroup>
 </Project>

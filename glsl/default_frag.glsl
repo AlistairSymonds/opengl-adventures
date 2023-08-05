@@ -3,5 +3,10 @@ out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    float r = 1.0f;
+    if (gl_FragCoord.x > (1920/2)){
+        r = (gl_FragCoord.x/1920) * r;
+    }
+
+    FragColor = vec4(r, 0.5f, 0.2f, 1.0f);
 } 
