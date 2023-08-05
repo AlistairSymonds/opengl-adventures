@@ -3,6 +3,8 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 
+#include "GLow.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -11,6 +13,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 static void glfwError(int id, const char* description)
 {
 	std::cout << description << std::endl;
+}
+
+void processInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 }
 
 int main() {
@@ -39,12 +47,22 @@ int main() {
 	}
 
 	//set a default size, then also make resizing easy
-	glViewport(0, 0, window_h, window_w);
+	glViewport(0, 0, window_w, window_h);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	GLow glow;
+	glow.compileShaders();
+	glow.setRenderProgram();
 	//go go gadget render loop
 	while (!glfwWindowShouldClose(window))
-	{
+	{	
+		//read command
+		processInput(window);
+		
+		//render new state
+		glow.render();
+
+		//display rendered output
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
