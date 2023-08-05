@@ -103,9 +103,17 @@ int GLow::render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+         -0.3, -0.5, 0.0,
+            0, 0.5, 0.0,
+         -0.6, -0.5, 0.0,
+
+         0.3, 0.5, 0.0,
+         0,   -0.5, 0.0,
+         0.6, 0.5, 0.0
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 2,   // first triangle
+        3, 4, 5    // second triangle
     };
 
     glCheckError();
@@ -123,6 +131,10 @@ int GLow::render()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glCheckError();
 
@@ -130,7 +142,8 @@ int GLow::render()
     glBindVertexArray(VAO);
     glUseProgram(shader_prog);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glCheckError();
     return 0;
 }
