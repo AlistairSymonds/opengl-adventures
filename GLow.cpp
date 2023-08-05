@@ -69,6 +69,11 @@ int GLow::compileShaders()
     glAttachShader(green_prog, shaders[green_frag]);
     glLinkProgram(green_prog);
 
+    colour_prog = glCreateProgram();
+    glAttachShader(colour_prog, shaders[default_vtx]);
+    glAttachShader(colour_prog, shaders[colour_frag]);
+    glLinkProgram(colour_prog);
+
     glCheckError();
 
     return 0;
@@ -93,6 +98,9 @@ GLow::shaders_t GLow::file_name_to_shader_id(std::filesystem::path p)
     else if (p == "glsl/default_2.frag") {
         s = green_frag;
     }
+    else if (p == "glsl/colour_interp.frag") {
+        s = colour_frag;
+    }
     return s;
 }
 
@@ -102,7 +110,7 @@ GLenum GLow::shader_id_to_gl_type(shaders_t s)
     {
         return GL_VERTEX_SHADER;
     }
-    else if (s == default_frag || s == green_frag)
+    else if (s == default_frag || s == green_frag || s == colour_frag)
     {
         return GL_FRAGMENT_SHADER;
     }
@@ -114,15 +122,15 @@ int GLow::render()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
+    int dwords_per_vert = 6;
     float vertices[] = {
-         -0.3, -0.5, 0.0,
-            0, 0.5, 0.0,
-         -0.6, -0.5, 0.0,
+         -0.3, -0.5, 0.0, 1.0f, 0.0f, 0.0f,
+            0, 0.5, 0.0, 0.0f, 1.0f, 0.0f,
+         -0.6, -0.5, 0.0, 0.0f, 0.0f, 1.0f,
 
-         0.3, 0.5, 0.0,
-         0,   -0.5, 0.0,
-         0.6, 0.5, 0.0
+         0.3, 0.5, 0.0, 1.0f, 0.0f, 0.0f,
+         0,   -0.5, 0.0, 0.0f, 1.0f, 0.0f,
+         0.6, 0.5, 0.0, 0.0f, 0.0f, 0.7f
     };
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 2,   // first triangle
@@ -139,8 +147,12 @@ int GLow::render()
     glBindVertexArray(VAO);
     glCheckError();
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, dwords_per_vert * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    //colour
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, dwords_per_vert * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1); //accessed using layout=1
     glCheckError();
 
     unsigned int VBO;
@@ -165,7 +177,7 @@ int GLow::render()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glUseProgram(red_prog);
+    glUseProgram(colour_prog);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 

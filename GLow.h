@@ -52,7 +52,8 @@ private:
 		ERROR = 0,
 		default_vtx = 1,
 		default_frag = 2,
-		green_frag = 3
+		green_frag = 3,
+		colour_frag = 4
 	} shaders_t;
 	
 	shaders_t file_name_to_shader_id(std::filesystem::path p);
@@ -63,5 +64,6 @@ private:
 
 	GLint red_prog;
 	GLint green_prog;
+	GLint colour_prog;
 };
 
