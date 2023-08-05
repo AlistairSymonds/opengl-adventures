@@ -45,40 +45,53 @@ int GLow::compileShaders()
             if (!success)
             {
                 glGetShaderInfoLog(glid, 512, NULL, infoLog);
-                std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+                std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" << infoLog << std::endl;
             }
             else
             {
                 shaders.insert(std::pair(id, glid));
             }
+            std::cout << std::endl;
         }
 
     }
     glCheckError();
+
+    //now link all the programs we'll need
+    red_prog = glCreateProgram();
+    glAttachShader(red_prog, shaders[default_vtx]);
+    glAttachShader(red_prog, shaders[default_frag]);
+    glLinkProgram(red_prog);
+    glCheckError();
+
+    green_prog = glCreateProgram();
+    glAttachShader(green_prog, shaders[default_vtx]);
+    glAttachShader(green_prog, shaders[green_frag]);
+    glLinkProgram(green_prog);
+
+    glCheckError();
+
     return 0;
 }
 
 int GLow::setRenderProgram()
 {
-    shader_prog = glCreateProgram();
-
-    glAttachShader(shader_prog, shaders[default_vtx]);
-    glAttachShader(shader_prog, shaders[default_frag]);
-    glLinkProgram(shader_prog);
-
-    glCheckError();
+    
     return 0;
 }
 
 GLow::shaders_t GLow::file_name_to_shader_id(std::filesystem::path p)
 {   
     shaders_t s = ERROR;
-    if (p == "glsl/default_vtx.glsl")
+    if (p == "glsl/default_vtx.vert")
     {
         s = default_vtx;
     }
-    else if ("glsl/default_frag.glsl") {
+    else if (p == "glsl/default.frag") {
         s = default_frag;
+    }
+    else if (p == "glsl/default_2.frag") {
+        s = green_frag;
     }
     return s;
 }
@@ -89,7 +102,7 @@ GLenum GLow::shader_id_to_gl_type(shaders_t s)
     {
         return GL_VERTEX_SHADER;
     }
-    else if (s == default_frag)
+    else if (s == default_frag || s == green_frag)
     {
         return GL_FRAGMENT_SHADER;
     }
@@ -116,6 +129,10 @@ int GLow::render()
         3, 4, 5    // second triangle
     };
 
+    unsigned int indices2[] = {  // note that we start from 0!
+        0,3,4   // first triangle
+    };
+
     glCheckError();
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -136,14 +153,25 @@ int GLow::render()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+
+    unsigned int EBO2;
+    glGenBuffers(1, &EBO2);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices2), indices2, GL_STATIC_DRAW);
+
     glCheckError();
 
     //final setup of shaders
     glBindVertexArray(VAO);
-    glUseProgram(shader_prog);
 
-
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glUseProgram(red_prog);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+    glUseProgram(green_prog);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     glCheckError();
     return 0;
 }

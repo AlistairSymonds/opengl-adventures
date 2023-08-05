@@ -49,10 +49,10 @@ private:
 
 
 	typedef enum shaders_t {
+		ERROR = 0,
 		default_vtx = 1,
 		default_frag = 2,
-		tex_frag = 3,
-		ERROR = 256
+		green_frag = 3
 	} shaders_t;
 	
 	shaders_t file_name_to_shader_id(std::filesystem::path p);
@@ -60,6 +60,8 @@ private:
 	GLenum shader_id_to_gl_type(shaders_t s);
 	std::unordered_map<shaders_t, GLuint> shaders;
 
-	uint32_t shader_prog;
+
+	GLint red_prog;
+	GLint green_prog;
 };
 
