@@ -52,6 +52,7 @@ int main() {
 
 	GLow glow;
 	glow.compileShaders();
+	glow.loadTextures();
 	glow.setRenderProgram();
 	//go go gadget render loop
 	while (!glfwWindowShouldClose(window))

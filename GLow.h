@@ -12,6 +12,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "stb_image.h"
+
 
 #define glCheckError() glCheckError_(__FILE__, __LINE__) 
 
@@ -21,6 +23,7 @@ public:
 	GLow();
 	int render();
 	int compileShaders();
+	int loadTextures();
 	int setRenderProgram();
 
 	GLenum glCheckError_(const char* file, int line)
@@ -47,6 +50,11 @@ public:
 private:
 	std::filesystem::path shader_dir;
 
+	typedef struct vert_t {
+		float pos[3];
+		float colour[3];
+		float tex[2];
+	}vert_t;
 
 	typedef enum shaders_t {
 		ERROR = 0,
@@ -67,5 +75,7 @@ private:
 	GLint green_prog;
 	GLint colour_prog;
 	GLint time_uniform_loc;
+
+	unsigned int froge_tex;
 };
 

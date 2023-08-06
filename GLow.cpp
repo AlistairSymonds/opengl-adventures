@@ -3,6 +3,9 @@
 #include <fstream>
 #include "GLow.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 GLow::GLow() {
     shader_dir = std::filesystem::path("glsl");
 }
@@ -80,6 +83,41 @@ int GLow::compileShaders()
     return 0;
 }
 
+int GLow::loadTextures()
+{   
+    glGenTextures(1, &froge_tex);
+    glBindTexture(GL_TEXTURE_2D, froge_tex);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    glCheckError();
+
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("textures/good-froge.png", &width, &height, &nrChannels, 3);
+    if (data)
+    {
+        //froge is height: 1891, width 1207 crash
+        //manually setting height: 1890 and width 1206 gets something correct looking
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+
+    stbi_image_free(data);
+
+    return 0;
+}
+
+
+
 int GLow::setRenderProgram()
 {
     
@@ -127,15 +165,15 @@ int GLow::render()
     float time = glfwGetTime();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    int dwords_per_vert = 6;
+    int dwords_per_vert = 8; //3 pos + 3 colour + 2 tex
     float vertices[] = {
-         -0.3, -0.5, 0.0, 1.0f, 0.0f, 0.0f,
-            0, 0.5, 0.0, 0.0f, 1.0f, 0.0f,
-         -0.6, -0.5, 0.0, 0.0f, 0.0f, 1.0f,
+         -0.3, -0.5, 0.0, 1.0f, 0.0f, 0.0f, 0.0, 0.0,
+            0,  0.5, 0.0, 0.0f, 1.0f, 0.0f, 1.0, 0.0,
+         -0.6, -0.5, 0.0, 0.0f, 0.0f, 1.0f, 0.0, 1.0,
 
-         0.3, 0.5, 0.0, 1.0f, 0.0f, 0.0f,
-         0,   -0.5, 0.0, 0.0f, 1.0f, 0.0f,
-         0.6, 0.5, 0.0, 0.0f, 0.0f, 0.7f
+         0.3, 0.5, 0.0, 1.0f, 0.0f, 0.0f, 0.0, 0.0,
+         0,  -0.5, 0.0, 0.0f, 1.0f, 0.0f, 1.0, 0.0,
+         0.6, 0.5, 0.0, 0.0f, 0.0f, 0.7f, 0.0, 1.0
     };
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 2,   // first triangle
@@ -158,6 +196,10 @@ int GLow::render()
     //colour
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, dwords_per_vert * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1); //accessed using layout=1
+
+    //tex coords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, dwords_per_vert * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2); //accessed using layout=1
     glCheckError();
 
     unsigned int VBO;
@@ -181,15 +223,18 @@ int GLow::render()
     //final setup of shaders
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glUseProgram(colour_prog);
-    glUniform1f(time_uniform_loc, time);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
     glUseProgram(green_prog);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     glCheckError();
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glUseProgram(colour_prog);
+    glUniform1f(time_uniform_loc, time);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
     return 0;
 }

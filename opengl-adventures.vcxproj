@@ -149,8 +149,13 @@
     <ClInclude Include="GLow.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="glsl\colour_interp.frag" />
+    <None Include="glsl\default.frag" />
+    <None Include="glsl\default_2.frag" />
     <None Include="glsl\default_frag.glsl" />
     <None Include="glsl\default_vtx.glsl" />
+    <None Include="glsl\default_vtx.vert" />
+    <None Include="glsl\sin_translation.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

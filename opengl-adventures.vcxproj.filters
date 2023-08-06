@@ -40,5 +40,20 @@
     <None Include="glsl\default_frag.glsl">
       <Filter>glsl</Filter>
     </None>
+    <None Include="glsl\colour_interp.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\default.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\default_2.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\default_vtx.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\sin_translation.vert">
+      <Filter>glsl</Filter>
+    </None>
   </ItemGroup>
 </Project>
