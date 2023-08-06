@@ -10,6 +10,7 @@ void main()
 {
     vec3 rates = vec3(1.0, 5.0, 8.0);
     vec3 pos = sin(time*rates/2) * aPos;
+    
     gl_Position = vec4(pos, 1.0);
     colour = sin(time*rates) * aColour;
     texCoords = aTexCoords;

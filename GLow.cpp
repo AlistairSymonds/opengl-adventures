@@ -85,6 +85,11 @@ int GLow::compileShaders()
 
 int GLow::loadTextures()
 {   
+    //mmm modern computing go brrr, I <3 unaligned
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    stbi_set_flip_vertically_on_load(true);
+
+
     glGenTextures(1, &froge_tex);
     glBindTexture(GL_TEXTURE_2D, froge_tex);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -167,17 +172,15 @@ int GLow::render()
     glClear(GL_COLOR_BUFFER_BIT);
     int dwords_per_vert = 8; //3 pos + 3 colour + 2 tex
     float vertices[] = {
-         -0.3, -0.5, 0.0, 1.0f, 0.0f, 0.0f, 0.0, 0.0,
-            0,  0.5, 0.0, 0.0f, 1.0f, 0.0f, 1.0, 0.0,
-         -0.6, -0.5, 0.0, 0.0f, 0.0f, 1.0f, 0.0, 1.0,
+         -0.8, -0.8, 0.0, 1.0f, 0.0f, 0.0f, 0.0, 0.0,
+         -0.8,  0.8, 0.0, 0.0f, 1.0f, 0.0f, 0.0, 1.0,
+          0.8, -0.8, 0.0, 0.0f, 0.0f, 1.0f, 1.0, 0.0,
+          0.8,  0.8, 0.0, 0.0f, 0.0f, 1.0f, 1.0, 1.0,
 
-         0.3, 0.5, 0.0, 1.0f, 0.0f, 0.0f, 0.0, 0.0,
-         0,  -0.5, 0.0, 0.0f, 1.0f, 0.0f, 1.0, 0.0,
-         0.6, 0.5, 0.0, 0.0f, 0.0f, 0.7f, 0.0, 1.0
     };
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 2,   // first triangle
-        3, 4, 5    // second triangle
+        1,2,3    // second triangle
     };
 
     unsigned int indices2[] = {  // note that we start from 0!
@@ -199,7 +202,7 @@ int GLow::render()
 
     //tex coords
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, dwords_per_vert * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2); //accessed using layout=1
+    glEnableVertexAttribArray(2); //accessed using layout=2
     glCheckError();
 
     unsigned int VBO;
@@ -228,7 +231,7 @@ int GLow::render()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
     glUseProgram(green_prog);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     glCheckError();
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

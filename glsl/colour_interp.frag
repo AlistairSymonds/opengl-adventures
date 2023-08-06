@@ -7,6 +7,6 @@ uniform sampler2D frogeTex;
 void main()
 {
    
-    //FragColor = vec4(colour, 1.0f);
-    FragColor = texture(frogeTex, texCoords);
+    //FragColor = 
+    FragColor = mix(texture(frogeTex, texCoords), vec4(colour, 1.0f),0.2);
 } 
